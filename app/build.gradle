@@ -27,4 +27,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
    // implementation 'com.github.lecho:hellocharts-library:1.5.8'
    // implementation project(path: ':hellocharts-library')
+    implementation 'uk.co.chrisjenx:calligraphy:2.2.0'
 }

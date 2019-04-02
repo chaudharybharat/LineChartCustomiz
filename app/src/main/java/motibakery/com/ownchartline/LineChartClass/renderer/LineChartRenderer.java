@@ -11,6 +11,7 @@ import android.graphics.Path;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.Rect;
 import android.graphics.Shader;
+import android.util.Log;
 
 
 import motibakery.com.ownchartline.LineChartClass.model.Line;
@@ -27,7 +28,7 @@ import motibakery.com.ownchartline.LineChartClass.view.Chart;
  * Renderer for line chart. Can draw lines, cubic lines, filled area chart and scattered chart.
  */
 public class LineChartRenderer extends AbstractChartRenderer {
-    private static final float LINE_SMOOTHNESS = 0.16f;
+    private static float LINE_SMOOTHNESS = 0.2f;
     private static final int DEFAULT_LINE_STROKE_WIDTH_DP = 3;
     private static final int DEFAULT_TOUCH_TOLERANCE_MARGIN_DP = 4;
 
@@ -75,8 +76,7 @@ public class LineChartRenderer extends AbstractChartRenderer {
             softwareBitmap = Bitmap.createBitmap(computator.getChartWidth(), computator.getChartHeight(),
                     Bitmap.Config.ARGB_8888);
             softwareCanvas.setBitmap(softwareBitmap);
-        }
-    }
+        }}
 
     @Override
     public void onChartDataChanged() {
@@ -214,6 +214,7 @@ public class LineChartRenderer extends AbstractChartRenderer {
      */
     private void drawPath(Canvas canvas, final Line line) {
         prepareLinePaint(line);
+        Log.e("hhh","=drawPath<<");
 
         int valueIndex = 0;
         for (PointValue pointValue : line.getValues()) {
@@ -241,6 +242,7 @@ public class LineChartRenderer extends AbstractChartRenderer {
     }
 
     private void drawSquarePath(Canvas canvas, final Line line) {
+        Log.e("hhh","=drawSquarePath<<");
         prepareLinePaint(line);
         int valueIndex = 0;
         float previousRawY = 0;
@@ -272,6 +274,7 @@ public class LineChartRenderer extends AbstractChartRenderer {
 
     private void drawSmoothPath(Canvas canvas, final Line line) {
         prepareLinePaint(line);
+        Log.e("hhh","=drawSmoothPath<<");
 
         final int lineSize = line.getValues().size();
         float prePreviousPointX = Float.NaN;
@@ -282,10 +285,13 @@ public class LineChartRenderer extends AbstractChartRenderer {
         float currentPointY = Float.NaN;
         float nextPointX = Float.NaN;
         float nextPointY = Float.NaN;
-
+          double last=0;
         for (int valueIndex = 0; valueIndex < lineSize; ++valueIndex) {
+
+          //  last=line.getValues().get(valueIndex).getY();
             if (Float.isNaN(currentPointX)) {
                 PointValue linePoint = line.getValues().get(valueIndex);
+
                 currentPointX = computator.computeRawX(linePoint.getX());
                 currentPointY = computator.computeRawY(linePoint.getY());
             }
@@ -326,14 +332,21 @@ public class LineChartRenderer extends AbstractChartRenderer {
                 path.moveTo(currentPointX, currentPointY);
             } else {
                 // Calculate control points.
+                if(last==nextPointY){
+                    LINE_SMOOTHNESS=0.0f;
+                }else {
+                    LINE_SMOOTHNESS=0.2f;
+
+                }
+
                 final float firstDiffX = (currentPointX - prePreviousPointX);
                 final float firstDiffY = (currentPointY - prePreviousPointY);
                 final float secondDiffX = (nextPointX - previousPointX);
                 final float secondDiffY = (nextPointY - previousPointY);
                 final float firstControlPointX = previousPointX + (LINE_SMOOTHNESS * firstDiffX);
-                final float firstControlPointY = previousPointY + (LINE_SMOOTHNESS * firstDiffY);
+                final float firstControlPointY = previousPointY + (LINE_SMOOTHNESS );
                 final float secondControlPointX = currentPointX - (LINE_SMOOTHNESS * secondDiffX);
-                final float secondControlPointY = currentPointY - (LINE_SMOOTHNESS * secondDiffY);
+                final float secondControlPointY = currentPointY - (LINE_SMOOTHNESS);
                 path.cubicTo(firstControlPointX, firstControlPointY, secondControlPointX, secondControlPointY,
                         currentPointX, currentPointY);
             }

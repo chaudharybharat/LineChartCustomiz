@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.text.TextUtils;
 
+import motibakery.com.ownchartline.LineChartActivity;
 import motibakery.com.ownchartline.LineChartClass.computator.ChartComputator;
 import motibakery.com.ownchartline.LineChartClass.model.Axis;
 import motibakery.com.ownchartline.LineChartClass.model.AxisValue;
@@ -100,8 +101,10 @@ public class AxesRenderer {
     private AxisAutoValues[] autoValuesBufferTab = new AxisAutoValues[]{new AxisAutoValues(),
             new AxisAutoValues(), new AxisAutoValues(), new AxisAutoValues()};
 
+    Context mcontent;
     public AxesRenderer(Context context, Chart chart) {
         this.chart = chart;
+        mcontent=context;
         computator = chart.getChartComputator();
         density = context.getResources().getDisplayMetrics().density;
         scaledDensity = context.getResources().getDisplayMetrics().scaledDensity;
@@ -597,11 +600,15 @@ public class AxesRenderer {
             } else {
                 labelX = rawValuesTab[position][valueToDrawIndex];
             }
-
+            Typeface typeFace = Typeface.createFromAsset(LineChartActivity.contacnt.getAssets(),
+                    "fonts/SF-Pro-Display-Bold");
+            labelPaintTab[position].setTypeface(typeFace);
             if (axis.hasTiltedLabels()) {
                 canvas.save();
                 canvas.translate(tiltedLabelXTranslation[position], tiltedLabelYTranslation[position]);
                 canvas.rotate(-45, labelX, labelY);
+
+
                 canvas.drawText(labelBuffer, labelBuffer.length - charsNumber, charsNumber, labelX, labelY,
                         labelPaintTab[position]);
                 canvas.restore();

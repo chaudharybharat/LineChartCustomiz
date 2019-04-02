@@ -18,7 +18,9 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
 import motibakery.com.ownchartline.LineChartClass.animation.ChartAnimationListener;
 import motibakery.com.ownchartline.LineChartClass.gesture.ZoomType;
@@ -32,6 +34,7 @@ import motibakery.com.ownchartline.LineChartClass.model.ValueShape;
 import motibakery.com.ownchartline.LineChartClass.model.Viewport;
 import motibakery.com.ownchartline.LineChartClass.util.ChartUtils;
 import motibakery.com.ownchartline.LineChartClass.view.LineChartView;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 
 public class LineChartActivity extends AppCompatActivity {
@@ -39,13 +42,17 @@ public class LineChartActivity extends AppCompatActivity {
  /*  public static String[] axisData = {"Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept",
             "Oct", "Nov", "Dec "};*/
 
-
+ public static LineChartActivity contacnt;
 
   //  public static  int[] yAxisData = {50, 20, 15, 30, 20, 60, 15, 40, 45, 10, 80, 18};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_line_chart);
+        contacnt=this;
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setFontAttrId(R.attr.fontPath)
+                .build());
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().add(R.id.container, new PlaceholderFragment()).commit();
         }
@@ -115,7 +122,7 @@ public class LineChartActivity extends AppCompatActivity {
             getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
             width = displaymetrics.widthPixels;
 
-          Log.e("test","==>"+(xBottomData.size() * width / 8));
+             Log.e("test","==>"+(xBottomData.size() * width / 8));
            chart.setLayoutParams(new LinearLayout.LayoutParams(3000,chart.getLayoutParams().height));
 
             chart.setOnValueTouchListener(new ValueTouchListener());
@@ -129,7 +136,7 @@ public class LineChartActivity extends AppCompatActivity {
             // Disable viewport recalculations, see toggleCubic() method for more info.
         //    chart.setViewportCalculationEnabled(false);
 
-            resetViewport();
+            resetViewport(100);
 
             return rootView;
         }
@@ -192,14 +199,14 @@ public class LineChartActivity extends AppCompatActivity {
             pointsHaveDifferentColor = false;
 
             chart.setValueSelectionEnabled(hasLabelForSelected);
-            resetViewport();
+            resetViewport(100);
         }
 
-        private void resetViewport() {
+        private void resetViewport(int topValue) {
             // Reset viewport height range to (0,80)
             final Viewport v = new Viewport(chart.getMaximumViewport());
             v.bottom = 0;
-            v.top = 100;
+            v.top = topValue;
             v.left = 0;
             v.right = numberOfPoints - 1;
             chart.setMaximumViewport(v);
@@ -233,25 +240,8 @@ public class LineChartActivity extends AppCompatActivity {
                 lines.add(line);
             }
             data = new LineChartData(lines);
-
-          /*  if (hasAxes) {
-                Axis axisX = new Axis();
-                Axis axisY = new Axis().setHasLines(true);
-                if (hasAxesNames) {
-                    axisX.setName("Axis X");
-                    axisY.setName("Axis Y");
-                }
-                data.setAxisXBottom(axisX);
-                data.setAxisYLeft(axisY);
-            } else {
-                data.setAxisXBottom(null);
-                data.setAxisYLeft(null);
-            }*/
             List yAxisValues = new ArrayList();
             List axisValues = new ArrayList();
-
-
-            Line line = new Line(yAxisValues).setColor(Color.parseColor("#9C27B0"));
 
             for (int i = 0; i < xBottomData.size(); i++) {
                 axisValues.add(i, new AxisValue(i).setLabel(xBottomData.get(i)));
@@ -263,33 +253,19 @@ public class LineChartActivity extends AppCompatActivity {
 
             Axis axis = new Axis();
             axis.setValues(axisValues);
+
             axis.setTextSize(16);
-         //   axis.setTextColor(Color.parseColor("#03A9F4"));
             data.setAxisXBottom(axis);
 
+
             Axis yAxis = new Axis();
-         //   yAxis.setName("Sales in millions");
             yAxis.setTextColor(Color.parseColor("#03A9F4"));
             yAxis.setTextSize(16);
-           data.setAxisYLeft(yAxis);
-          //  data.setBaseValue(Float.NEGATIVE_INFINITY);
+         //  data.setAxisYLeft(yAxis);
             chart.setLineChartData(data);
         }
 
-        /**
-         * Adds lines to data, after that data should be set again with
-         * {@link LineChartView#setLineChartData(LineChartData)}. Last 4th line has non-monotonically x values.
-         */
 
-
-
-
-
-        /**
-         * To animate values you have to change targets values and then call {//@link Chart#startDataAnimation()}
-         * method(don't confuse with View.animate()). If you operate on data that was set before you don't have to call
-         * {@link LineChartView#setLineChartData(LineChartData)} again.
-         */
         public int getMax(List<Integer> lists){
             int max = Integer.MIN_VALUE;
             for(int i=0; i<lists.size(); i++){
@@ -315,91 +291,41 @@ public class LineChartActivity extends AppCompatActivity {
                     xBottomData.add("7");
                     YData.clear();
                     YData.add(80);
+                    YData.add(5);
+                    YData.add(0);
+                    YData.add(0);
+                    YData.add(0);
+                    YData.add(0);
                     YData.add(80);
-                    YData.add(80);
-                    YData.add(30);
-                    YData.add(40);
-                    YData.add(10);
-                    YData.add(1);
                     numberOfPoints=7;
                     randomNumbersTab = new float[maxNumberOfLines][numberOfPoints];
                     generateValues();
                   //  reset();
                     generateData();
-                    resetViewport();
+                    int max_value=getMax(YData);
+                    resetViewport(max_value+8);
                     break;
                 case R.id.btn_month:
-                    chart.setLayoutParams(new LinearLayout.LayoutParams(5000,chart.getLayoutParams().height));
-                    xBottomData.clear();
-                    xBottomData.add(" 1");
-                    xBottomData.add("2");
-                    xBottomData.add("3");
-                    xBottomData.add("4");
-                    xBottomData.add("5");
-                    xBottomData.add("6");
-                    xBottomData.add("7");
-                    xBottomData.add("8");
-                    xBottomData.add("9");
-                    xBottomData.add("10");
-                    xBottomData.add("11");
-                    xBottomData.add("12");
-                    xBottomData.add("13");
-                    xBottomData.add("14");
-                    xBottomData.add("15");
-                    xBottomData.add("16");
-                    xBottomData.add("17");
-                    xBottomData.add("18");
-                    xBottomData.add("19");
-                    xBottomData.add("20");
-                    xBottomData.add("21");
-                    xBottomData.add("22");
-                    xBottomData.add("23");
-                    xBottomData.add("24");
-                    xBottomData.add("25");
-                    xBottomData.add("26");
-                    xBottomData.add("27");
-                    xBottomData.add("28");
-                    xBottomData.add("29");
-                    xBottomData.add("30");
-                    xBottomData.add("31");
-                    YData.clear();
-                    YData.add(50);
-                    YData.add(60);
-                    YData.add(70);
-                    YData.add(80);
-                    YData.add(80);
-                    YData.add(80);
-                    YData.add(80);
-                    YData.add(50);
-                    YData.add(60);
-                    YData.add(70);
-                    YData.add(70);
-                    YData.add(70);
-                    YData.add(80);
 
-                    YData.add(50);
-                    YData.add(60);
-                    YData.add(70);
-                    YData.add(80);
-                    YData.add(80);
-                    YData.add(80);
-                    YData.add(50);
-                    YData.add(60);
-                    YData.add(70);
-                    YData.add(70);
-                    YData.add(70);
-                    YData.add(80);
-                    YData.add(80);
-                    YData.add(80);
-                    YData.add(80);
-                    YData.add(80);
-                    YData.add(80);
-                    YData.add(80);
-                    numberOfPoints=31;
+                    Calendar calendar = Calendar.getInstance();
+                   int year= calendar.get(Calendar.YEAR);
+                   int month= calendar.get(Calendar.MONTH)+1;
+                 int day_of_month= getMonthDays(month,year);
+                 chart.setLayoutParams(new LinearLayout.LayoutParams(5000,chart.getLayoutParams().height));
+                    xBottomData.clear();
+                    YData.clear();
+                    for (int i = 1; i <=day_of_month ; i++) {
+                        //month of date
+                        xBottomData.add(""+i);
+                        //day of value
+                        YData.add((new Random()).nextInt((90 - 10) + 1) + 10);
+                    }
+                    numberOfPoints=day_of_month;
                     randomNumbersTab = new float[maxNumberOfLines][numberOfPoints];
                     generateValues();
                     generateData();
-                    resetViewport();
+                    int max_value1=getMax(YData);
+                    resetViewport(max_value1+8);
                     break;
                 case R.id.btn_year:
                     chart.setLayoutParams(new LinearLayout.LayoutParams(2500,chart.getLayoutParams().height));
@@ -408,7 +334,8 @@ public class LineChartActivity extends AppCompatActivity {
                     randomNumbersTab = new float[maxNumberOfLines][numberOfPoints];
                     generateValues();
                     generateData();
-                    resetViewport();
+                    int max_value2=getMax(YData);
+                    resetViewport(max_value2+8);
                     break;
 
             }
@@ -428,5 +355,19 @@ public class LineChartActivity extends AppCompatActivity {
             }
 
         }
+    }
+    public static int getMonthDays(int month, int year) {
+        int daysInMonth ;
+        if (month == 4 || month == 6 || month == 9 || month == 11) {
+            daysInMonth = 30;
+        }
+        else {
+            if (month == 2) {
+                daysInMonth = (year % 4 == 0) ? 29 : 28;
+            } else {
+                daysInMonth = 31;
+            }
+        }
+        return daysInMonth;
     }
 }

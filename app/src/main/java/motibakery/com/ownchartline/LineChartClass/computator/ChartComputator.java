@@ -3,6 +3,7 @@ package motibakery.com.ownchartline.LineChartClass.computator;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.util.Log;
 
 import motibakery.com.ownchartline.LineChartClass.listener.DummyVieportChangeListener;
 import motibakery.com.ownchartline.LineChartClass.listener.ViewportChangeListener;
@@ -149,7 +150,9 @@ public class ChartComputator {
      * 0 that means top most pixel of the screen.
      */
     public float computeRawY(float valueY) {
-        final float pixelOffset = (valueY - currentViewport.bottom) * (contentRectMinusAllMargins.height() /
+        Log.e("test","currentViewport.bottom"+currentViewport.bottom);
+        Log.e("test","contentRectMinusAllMargins.bottom"+contentRectMinusAllMargins.bottom);
+        final float pixelOffset = (valueY -currentViewport.bottom ) * (contentRectMinusAllMargins.height() /
                 currentViewport.height());
         return contentRectMinusAllMargins.bottom - pixelOffset;
     }
