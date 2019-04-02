@@ -600,9 +600,7 @@ public class AxesRenderer {
             } else {
                 labelX = rawValuesTab[position][valueToDrawIndex];
             }
-            Typeface typeFace = Typeface.createFromAsset(LineChartActivity.contacnt.getAssets(),
-                    "fonts/SF-Pro-Display-Bold");
-            labelPaintTab[position].setTypeface(typeFace);
+
             if (axis.hasTiltedLabels()) {
                 canvas.save();
                 canvas.translate(tiltedLabelXTranslation[position], tiltedLabelYTranslation[position]);
